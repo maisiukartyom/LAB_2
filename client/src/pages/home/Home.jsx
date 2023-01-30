@@ -1,15 +1,23 @@
 import './home.css'
-import React from 'react'
+import React, { useContext } from 'react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from '../../context/AuthContext'
 
 const Home = () => {
 
     const [data, setData] = useState({})
     const [loading, setLoading] = useState(true)
     const [status, setStatus] = useState("")
+
+    const navigate = useNavigate()
+
+    const {user} = useContext(AuthContext)
+    if (!user){
+        navigate("/login")
+    }
 
     useEffect(() => {
         const getData = async () => {
@@ -73,8 +81,7 @@ const Home = () => {
         setStatus(e.target.value)
     }
 
-    const navigate = useNavigate()
-
+    
     const handleClick = () => {
         navigate("/create")
     }
