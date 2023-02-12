@@ -15,9 +15,6 @@ const Home = () => {
     const navigate = useNavigate()
 
     const {user} = useContext(AuthContext)
-    if (!user){
-        navigate("/login")
-    }
 
     useEffect(() => {
         const getData = async () => {
@@ -25,7 +22,11 @@ const Home = () => {
             setData(res.data)
             setLoading(false)
         }
+        if (!user){
+            navigate("/login")
+        }
         getData()
+
 
     },[])
 
@@ -77,6 +78,37 @@ const Home = () => {
         })
     }
 
+    const [asc, setAsc] = useState(true)
+    const handleTitles = () => {
+        asc ? 
+        setData(prev => {
+            return{
+                ...prev, notes: data.notes.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0))
+            }   
+        }) :
+        setData(prev => {
+            return{
+                ...prev, notes: data.notes.sort((a,b) => (a.title < b.title) ? 1 : ((b.title < a.title) ? -1 : 0))
+            }   
+        })
+        setAsc(!asc)
+    }
+    const [asc2, setAsc2] = useState(true)
+    const handleDates = () => {
+        asc2 ? 
+        setData(prev => {
+            return{
+                ...prev, notes: data.notes.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
+            }   
+        }) :
+        setData(prev => {
+            return{
+                ...prev, notes: data.notes.sort((a,b) => (a.date < b.date) ? 1 : ((b.date < a.date) ? -1 : 0))
+            }   
+        })
+        setAsc2(!asc2)
+    }
+
     const handleChange = (e) => {
         setStatus(e.target.value)
     }
@@ -86,8 +118,22 @@ const Home = () => {
         navigate("/create")
     }
 
+    const {dispatch} = useContext(AuthContext)
+    const handleLogout = async () => {
+        dispatch({type: "LOGOUT"   })
+        const res = await axios.post("/auth/logout", { } , { withCredentials: true })
+        navigate("/login")
+    }
+
     return (
+        user &&
         <div className="container-fluid mt-5">
+            <h2>{user.details.username}</h2>
+            <div className="input-group-append">
+                <button className="btn btn-outline-secondary" onClick={()=>navigate("/login")}>Login</button>
+                <button className="btn btn-outline-secondary" onClick={()=>navigate("/register")}>Register</button>
+                <button className="btn btn-outline-secondary" onClick={handleLogout}>Logout</button>
+            </div> 
             <h1>Заметки</h1>
 
                 <div className="input-group mb-2">
@@ -109,7 +155,7 @@ const Home = () => {
                     data.isVisible ? 
                     (<table className="table table-hover table-bordered">
                         <thead className="thead-light">
-                            <tr><th>Заголовок</th><th>Дата</th><th>Статус</th></tr>
+                            <tr><th onClick={handleTitles}>Заголовок</th><th onClick={handleDates}>Дата</th><th>Статус</th></tr>
                         </thead>
                         <tbody>
                             {

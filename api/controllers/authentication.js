@@ -17,6 +17,7 @@ export const Register = async(req, res, next) => {
         res.status(200).json("User has been created")
     }
     catch(err){
+        res.status(404)
     }
 }
 
@@ -44,4 +45,15 @@ export const Login = async(req, res, next) => {
         } catch (err) {
           next(err);
     }
+}
+
+export const Logout = (req, res) => {
+    // res
+    //     .cookie("access_token", "none", {
+    //         httpOnly: true,
+    //     })
+    //     .status(200)
+
+    res.clearCookie('access_token')
+    res.status(200).json('User Logged out')
 }
